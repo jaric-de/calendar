@@ -68,4 +68,67 @@ class Calendar extends DB_Connect
         $this->_daysInMonth = cal_days_in_month(CAL_GREGORIAN, $this->_m, $this->_y);
         $this->_startDay = $dateTimeObj->format('w');
     }
+    
+    private function _loadEventData($id = NULL)
+    {
+        $sql = "SELECT
+                      `event_id`, `event_title`, `event_desc`, `event_start`, `event_end`
+                FROM `events`";
+
+        /**
+         * загрузить событие по event_id, если передан параметр id
+         */
+        if (!empty($id)) {
+            $sql .= "WHERE `event_id` =:id LIMIT 1";
+        }
+        /**
+         * В противном случае зугрузить все события относяшиеся к использ. месяцу
+         */
+        else
+        {
+            $dateTimeObj = new DateTime($this->_useDate);
+            $firstDayOfTheMonth = $dateTimeObj->modify('first day of this month')->format('Y-m-d H:i:s');
+            $LastDayOfTheMonth = $dateTimeObj->modify('last day of this month')->format('Y-m-d H:i:s');
+            $sql .= "WHERE `event_start`
+                        BETWEEN `$firstDayOfTheMonth`
+                        AND `$LastDayOfTheMonth`";
+        }
+
+        try
+        {
+            $stmt = $this->db->prepare($sql);
+            /**
+             * Привязать параметр, если был передан идентификатор
+             */
+            if (!empty($id)) {
+                $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+            }
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+
+            return $results;
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+    }
+
+    private function _createEventObj()
+    {
+        /**
+         * Загрузить массив событий
+         */
+        $arr = $this->_loadEventData();
+        $events = [];
+        foreach ($arr as $event) {
+            $day = (new DateTime($event['event_start']))->format('j');
+            try
+            {
+                $events[$day][] = new Event($event);
+            } catch (Exception $e) {
+                die($e->getMessage());
+            }
+        }
+        return $events;
+    }
 }
