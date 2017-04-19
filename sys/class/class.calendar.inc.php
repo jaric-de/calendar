@@ -90,11 +90,11 @@ class Calendar extends DB_Connect
         else
         {
             $dateTimeObj = new DateTime($this->_useDate);
-            $firstDayOfTheMonth = $dateTimeObj->modify('first day of this month')->format('Y-m-d H:i:s');
-            $LastDayOfTheMonth = $dateTimeObj->modify('last day of this month')->format('Y-m-d H:i:s');
+            $firstDayOfTheMonth = $dateTimeObj->modify('first day of this month')->format('Y-m-d');
+            $LastDayOfTheMonth = $dateTimeObj->modify('last day of this month')->format('Y-m-d');
             $sql .= "WHERE `event_start`
-                        BETWEEN `$firstDayOfTheMonth`
-                        AND `$LastDayOfTheMonth`";
+                        BETWEEN '$firstDayOfTheMonth'
+                        AND '$LastDayOfTheMonth'";
         }
 
         try
@@ -144,9 +144,6 @@ class Calendar extends DB_Connect
          * Определить месяц календаря и созадть массив сокр. обозночений дня недели
          */
         $dateTimeObj = new DateTime($this->_useDate);
-        echo "<pre>";
-        print_r($dateTimeObj->modify('first day of this month')->format('w'));
-        echo "</pre>";
         $calMonth = $dateTimeObj->format('F Y');
         $weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         /**
@@ -157,6 +154,11 @@ class Calendar extends DB_Connect
             $labels .= "\n\t\t<li>" . $weekdays[$d] . "</li>";
         }
         $html .= "\n\t<ul class='weekdays'>" . $labels . "\n\t</ul>";
+
+        /**
+         * Загрузить данные о событиях
+         */
+        $events = $this->_createEventObj();
 
         /**
          * Добавить HTML-разметку календаря
@@ -184,6 +186,17 @@ class Calendar extends DB_Connect
              * Добавить день месяца, идент. ячейку календаря
              */
             if ($this->_startDay < $i && $this->_daysInMonth >= $c) {
+                /**
+                 * Форматировать данные о событиях
+                 */
+                $eventInfo = NULL;
+                if (isset($events[$c])) {
+                    foreach ($events[$c] as $event) {
+                        $link = '<a href="view.php?event_id=' . $event->id . '">' . $event->title . '</a>';
+                        $eventInfo .= "\n\t\t\t$link";
+                    }
+                }
+
                 $date = sprintf("\n\t\t\t<strong>%d</strong>", $c++);
             } else {
                 $date = "&nbsp;";
@@ -197,7 +210,7 @@ class Calendar extends DB_Connect
             /**
              * Собрать разрозненые части воедино
              */
-            $html .= $ls . $date . $le . $wrap;
+            $html .= $ls . $date . $eventInfo . $le . $wrap;
         }
 
         /**

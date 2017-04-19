@@ -10,6 +10,9 @@ foreach ($C as $name => $val) {
  */
 $dsn = "mysql:host" . DB_HOST . ";dbname=" . DB_NAME;
 $dbo = new PDO($dsn, DB_USER, DB_PASS);
+echo "<pre>";
+print_r($dbo);
+echo "</pre>";
 
 function __autoload($class)
 {
