@@ -8,11 +8,8 @@ foreach ($C as $name => $val) {
 /**
  * Создать PDO объект
  */
-$dsn = "mysql:host" . DB_HOST . ";dbname=" . DB_NAME;
-$dbo = new PDO($dsn, DB_USER, DB_PASS);
-echo "<pre>";
-print_r($dbo);
-echo "</pre>";
+$dsn = "mysql:host=". DB_HOST .";dbname=". DB_NAME .";charset=" . DB_CHARSET;
+$dbo = new PDO($dsn, DB_USER, DB_PASS, $GLOBALS['pdoOptions']);
 
 function __autoload($class)
 {

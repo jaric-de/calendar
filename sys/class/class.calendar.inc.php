@@ -107,7 +107,7 @@ class Calendar extends DB_Connect
                 $stmt->bindParam(":id", $id, PDO::PARAM_INT);
             }
             $stmt->execute();
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $results = $stmt->fetchAll();
             $stmt->closeCursor();
 
             return $results;
@@ -182,6 +182,7 @@ class Calendar extends DB_Connect
             $ls = sprintf("\n\t\t<li class = '%s'>", $class); // tag <li> start
             $le = "\n\t\t</li>"; // tag </li> end
 
+            $eventInfo = NULL;
             /**
              * Добавить день месяца, идент. ячейку календаря
              */
@@ -189,7 +190,6 @@ class Calendar extends DB_Connect
                 /**
                  * Форматировать данные о событиях
                  */
-                $eventInfo = NULL;
                 if (isset($events[$c])) {
                     foreach ($events[$c] as $event) {
                         $link = '<a href="view.php?event_id=' . $event->id . '">' . $event->title . '</a>';
