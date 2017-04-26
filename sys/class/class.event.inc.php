@@ -32,11 +32,11 @@ class Event
     public function __construct($event)
     {
         if (is_array($event)) {
-            $this->id = $event['event_id'];
-            $this->title = $event['event_title'];
-            $this->description = $event['event_desc'];
-            $this->start = $event['event_start'];
-            $this->end = $event['event_end'];
+            $this->id = isset($event['event_id']) ? $event['event_id'] : NULL;
+            $this->title = isset($event['event_title']) ? $event['event_title'] : NULL;
+            $this->description = isset($event['event_desc']) ? $event['event_desc'] : NULL;
+            $this->start = isset($event['event_start']) ? $event['event_start'] : NULL;
+            $this->end = isset($event['event_end']) ? $event['event_end'] : NULL;
         } else {
             throw new Exception("The event data were not presented");
         }

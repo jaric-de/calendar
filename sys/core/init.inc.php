@@ -1,6 +1,10 @@
 <?php
-include_once '../sys/config/db-cred.inc.php';
+session_start();
+if (!isset($_SESSION['token'])) {
+    $_SESSION['token'] = sha1(uniqid(mt_rand(), TRUE)); // генерация случайного хеш-кода (маркер сеанса), если это не было сделано ранее для защиты от CSRF
+}
 
+include_once '../sys/config/db-cred.inc.php';
 foreach ($C as $name => $val) {
     define($name, $val);
 }

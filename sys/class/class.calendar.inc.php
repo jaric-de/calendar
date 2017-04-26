@@ -251,4 +251,48 @@ class Calendar extends DB_Connect
             . "\n\t<p class='dates'>$date, $start&mdash;$end</p>"
             . "\n\t<p>$event->description</p>";
     }
+
+    public function displayForm()
+    {
+        $id = isset($_POST['event_id']) ? (int)$_POST['event_id'] : NULL;
+        $submit = 'Create Event';
+        $event = new Event([]);
+        if (!empty($id)) {
+            $event = $this->_loadEventById($id);
+            if (!is_object($event)) {
+                return NULL;
+            }
+
+            $submit = "Change event";
+        }
+
+        /**
+         * Создать разметку
+         */
+        return <<<FORM_MARKUP
+        <form action="assets/inc/process.inc.php" method="post">
+            <fieldset>
+                <legend>$submit</legend>
+                <label for=event_title>Event name</label>
+                <input type="text" name="event_title"
+                    id="event_title" value="$event->title" />
+                <label for=event_start>Event Start</label>
+                <input type="text" name="event_start"
+                    id="event_start" value="$event->start" />
+                <label for=event_end>Event end</label>
+                <input type="text" name="event_end"
+                    id="event_end" value="$event->end" />
+                <label for=event_description>Event Description</label>
+                <textarea name="event_description"
+                    id="event_description">$event->description
+                </textarea>    
+                <input type="hidden" name="event_id" value="$event->id" />
+                <input type="hidden" name="token" value="$_SESSION[token]" />
+                <input type="hidden" name="action" value="event_edit" />
+                <input type="submit" name="event_submit" value="$submit" />
+                or <a href="./">Cancel</a>
+            </fieldset>
+        </form>
+FORM_MARKUP;
+    }
 }
