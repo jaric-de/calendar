@@ -5,8 +5,8 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <title><?php echo $page_title;?></title>
-    <?php foreach ($css_files as $css): ?>
+    <title><?php echo $pageTitle;?></title>
+    <?php foreach ($cssFiles as $css): ?>
         <link rel="stylesheet" type="text/css" media="screen,projection"
               href="assets/css/<?php echo $css; ?>"/>
     <?php endforeach; ?>

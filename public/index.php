@@ -10,7 +10,7 @@ require_once '../sys/core/init.inc.php'; // файл инициализации
 $cal = new Calendar($dbo);
 
 $pageTitle = 'Calendar';
-$css_files = ['style.css'];
+$cssFiles = ['style.css'];
 include_once 'assets/common/header.inc.php';
 
 ?>

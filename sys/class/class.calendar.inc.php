@@ -82,7 +82,7 @@ class Calendar extends DB_Connect
          * загрузить событие по event_id, если передан параметр id
          */
         if (!empty($id)) {
-            $sql .= "WHERE `event_id` =:id LIMIT 1";
+            $sql .= " WHERE `event_id`=:id LIMIT 1";
         }
         /**
          * В противном случае зугрузить все события относяшиеся к использ. месяцу
@@ -133,6 +133,18 @@ class Calendar extends DB_Connect
             }
         }
         return $events;
+    }
+
+    private function _loadEventById($id) {
+        if (empty($id)) {
+            return NULL;
+        }
+        $event = $this->_loadEventData($id);
+        if (isset($event[0])) {
+            return new Event($event[0]);
+        } else {
+            return NULL;
+        }
     }
 
     /**
@@ -223,5 +235,20 @@ class Calendar extends DB_Connect
         $html .= "\n\t</ul>\n\n";
         
         return $html;
+    }
+
+    public function displayEvent($id) {
+        if (empty($id)) {
+            return NULL;
+        }
+        $id = preg_replace('/[^0-9]/', '', $id);
+        $event = $this->_loadEventById($id);
+        $date = (new DateTime($event->start))->format('F d, Y');
+        $start = (new DateTime($event->start))->format('g:ia');
+        $end = (new DateTime($event->end))->format('g:ia');
+
+        return "<h2>$event->title</h2>"
+            . "\n\t<p class='dates'>$date, $start&mdash;$end</p>"
+            . "\n\t<p>$event->description</p>";
     }
 }
