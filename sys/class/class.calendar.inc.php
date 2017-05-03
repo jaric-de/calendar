@@ -233,8 +233,13 @@ class Calendar extends DB_Connect
             ++$i;
         }
         $html .= "\n\t</ul>\n\n";
+
+        /**
+         * отобразить опции администрирования
+         */
+        $admin = $this->_adminGeneralOptions();
         
-        return $html;
+        return $html . $admin;
     }
 
     public function displayEvent($id) {
@@ -247,9 +252,11 @@ class Calendar extends DB_Connect
         $start = (new DateTime($event->start))->format('g:ia');
         $end = (new DateTime($event->end))->format('g:ia');
 
+        $admin = $this->_adminEntryOptions($id);
+
         return "<h2>$event->title</h2>"
             . "\n\t<p class='dates'>$date, $start&mdash;$end</p>"
-            . "\n\t<p>$event->description</p>";
+            . "\n\t<p>$event->description</p>$admin";
     }
 
     public function displayForm()
@@ -294,5 +301,78 @@ class Calendar extends DB_Connect
             </fieldset>
         </form>
 FORM_MARKUP;
+    }
+
+    public function processForm()
+    {
+        if ($_POST['action'] !== 'event_edit') {
+            return 'processForm method incorrect using';
+        }
+
+        $title = htmlentities($_POST['event_title'], ENT_QUOTES);
+        $desc = htmlentities($_POST['event_description'], ENT_QUOTES);
+        $start = htmlentities($_POST['event_start'], ENT_QUOTES);
+        $end = htmlentities($_POST['event_end'], ENT_QUOTES);
+
+        /**
+         * Если ID не передан, значит создаем новое событие
+         */
+        if (empty($_POST['event_id'])) {
+            $sql = "INSERT INTO `events`
+                      (`event_title`, `event_desc`, `event_start`, `event_end`)
+                    VALUES (:title, :description, :start, :end)";
+        } else {
+            $id = (int)$_POST['event_id']; // POST всегда возвращает данные в виде строки. В целях безопасности желательно привести к int
+            $sql = "UPDATE `events`
+                    SET `event_title` = :title,
+                        `event_desc` = :description,
+                        `event_start` = :start,
+                        `event_end` = :end
+                    WHERE `event_id` = $id";
+        }
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(":title", $title, PDO::PARAM_STR);
+            $stmt->bindParam(":description", $desc, PDO::PARAM_STR);
+            $stmt->bindParam(":start", $start, PDO::PARAM_STR);
+            $stmt->bindParam(":end", $end, PDO::PARAM_STR);
+            $stmt->execute();
+            $stmt->closeCursor();
+            return TRUE;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * Генерирует разметку для отображения административных ссылок
+     */
+    private function _adminGeneralOptions()
+    {
+        return <<<ADMIN_OPTIONS
+<a href="admin.php" class="admin">+ Add new event</a>
+ADMIN_OPTIONS;
+    }
+
+
+    /**
+     * Генерирует разметку для отображения административных ссылок редактирования и удаления события для конкретного события по id
+     *
+     * @param int $id: идентифекатор события
+     * @return string
+     */
+    private function _adminEntryOptions($id)
+    {
+        return <<<ADMIN_OPTIONS
+<div class="admin-options">
+    <form action="admin.php" method="post">
+        <p>
+            <input type="submit" name="edit_event" value="Edit event" />
+            <input type="hidden" name="event_id" value="$id" />
+        </p>
+    </form>
+</div>
+ADMIN_OPTIONS;
     }
 }

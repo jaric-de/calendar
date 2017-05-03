@@ -15,7 +15,7 @@ if (isset($_GET['event_id'])) {
 require_once '../sys/core/init.inc.php';
 
 $pageTitle = "Event";
-$cssFiles = ["style.css"];
+$cssFiles = ["style.css", "admin.css"];
 
 require_once 'assets/common/header.inc.php';
 $cal = new Calendar($dbo);

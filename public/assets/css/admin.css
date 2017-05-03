@@ -65,6 +65,7 @@ input[type=submit] {
 }
 
 a.admin {
+    background-color: #789;
     display: inline-block;
     margin: 4px 0;
     padding: 4px;
