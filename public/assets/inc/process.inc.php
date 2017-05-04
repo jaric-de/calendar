@@ -12,7 +12,8 @@ $actions = [
     'event_edit' => [
         'object' => 'Calendar',
         'method' => 'processForm',
-        'header' => 'Location: ../../'
+//        'header' => 'Location: ../../admin.php'
+        'header' => 'Location: ../../' // index.php
     ]
 ];
 

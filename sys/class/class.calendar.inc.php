@@ -345,6 +345,61 @@ FORM_MARKUP;
         }
     }
 
+
+    /**
+     * Этот скрипт запускается в двух случаях. 1) Когда мы нажимаем на кнопку DELETE 2) Когда мы в форме подтверждения нажимаем на любую из кнопок
+     *
+     * @param $id
+     * @return null|string|void
+     */
+    public function confirmDelete($id)
+    {
+        if (empty($id)) {
+            return NULL;
+        }
+
+        $id = preg_replace('/[^0-9]/', '', $id);
+
+        if (isset($_POST['confirm_delete']) && $_POST['token'] === $_SESSION['token']) { // мы попадаем в этот if только если мы работает с формой подтверждением
+            if ($_POST['confirm_delete'] === "Yes, delete") { // нажали `Yes, Delete`
+                $sql = "DELETE FROM `events` WHERE `event_id`=:id LIMIT 1";
+                try {
+                    $stmt = $this->db->prepare($sql);
+                    $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $stmt->closeCursor();
+                    header('Location: ./');
+                } catch (Exception $e) {
+                    return $e->getMessage();
+                }
+            }
+            else // нажали `No, it was a joke`
+            {
+                header("Location: ./");
+                return;
+            }
+        }
+
+        $event = $this->_loadEventById($id);
+
+        if (!is_object($event)) {
+            header("Location: ./");
+        }
+
+        return <<<CONFIRM_DELETE
+<form action="confirmdelete.php" method="post">
+    <h2>Are you sure you want to delete the event "$event->title"</h2>
+    <p><strong>Deleted event is impossible to reestablish</strong></p>
+    <p>
+        <input type="submit" name="confirm_delete" value="Yes, delete" />
+        <input type="submit" name="confirm_delete" value="No, it was a joke!" />
+        <input type="hidden" name="event_id" value="$event->id" />
+        <input type="hidden" name="token" value="$_SESSION[token]" />
+    </p>
+</form>
+CONFIRM_DELETE;
+    }
+
     /**
      * Генерирует разметку для отображения административных ссылок
      */
@@ -369,6 +424,12 @@ ADMIN_OPTIONS;
     <form action="admin.php" method="post">
         <p>
             <input type="submit" name="edit_event" value="Edit event" />
+            <input type="hidden" name="event_id" value="$id" />
+        </p>
+    </form>
+     <form action="confirmdelete.php" method="post">
+        <p>
+            <input type="submit" name="delete_event" value="Delete event" />
             <input type="hidden" name="event_id" value="$id" />
         </p>
     </form>
