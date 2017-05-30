@@ -25,5 +25,8 @@ echo $cal->buildCalendar();
 ?>
 </div>
 <?php
+    echo isset($_SESSION['user']) ? "Вход выполнен!" : "Вход не выполнен";
+?>
+<?php
 
 require_once 'assets/common/footer.inc.php';

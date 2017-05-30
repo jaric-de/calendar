@@ -1,6 +1,11 @@
 <?php
 require_once '../sys/core/init.inc.php';
 
+if (!isset($_SESSION['user'])) {
+    header('Location: ./');
+    die();
+}
+
 $pageTitle = "Add/Edit Form";
 $cssFiles = ["style.css", "admin.css"];
 

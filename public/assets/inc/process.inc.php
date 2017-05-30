@@ -14,6 +14,16 @@ $actions = [
         'method' => 'processForm',
 //        'header' => 'Location: ../../admin.php'
         'header' => 'Location: ../../' // index.php
+    ],
+    'user_login' => [
+        'object' => 'Admin',
+        'method' => 'processLoginForm',
+        'header' => 'Location: ../../' // index.php
+    ],
+    'user_logout' => [
+        'object' => 'Admin',
+        'method' => 'processLogout',
+        'header' => 'Location: ../../' // index.php
     ]
 ];
 

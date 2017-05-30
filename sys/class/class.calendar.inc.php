@@ -405,9 +405,22 @@ CONFIRM_DELETE;
      */
     private function _adminGeneralOptions()
     {
-        return <<<ADMIN_OPTIONS
+        if (isset($_SESSION['user'])) {
+            return <<<ADMIN_OPTIONS
 <a href="admin.php" class="admin">+ Add new event</a>
+<form action="assets/inc/process.inc.php" method="post">
+    <div>
+        <input type="submit" value="Logout" class="admin" />
+        <input type="hidden" name="token" value="$_SESSION[token]" />
+        <input type="hidden" name="action" value="user_logout" />
+    </div>
+</form>
 ADMIN_OPTIONS;
+        } else {
+            return <<<ADMIN_OPTIONS
+            <a href="login.php">Log In</a>
+ADMIN_OPTIONS;
+        }
     }
 
 
@@ -419,7 +432,8 @@ ADMIN_OPTIONS;
      */
     private function _adminEntryOptions($id)
     {
-        return <<<ADMIN_OPTIONS
+        if (isset($_SESSION['user'])) {
+            return <<<ADMIN_OPTIONS
 <div class="admin-options">
     <form action="admin.php" method="post">
         <p>
@@ -435,5 +449,8 @@ ADMIN_OPTIONS;
     </form>
 </div>
 ADMIN_OPTIONS;
+        } else {
+            return NULL;
+        }
     }
 }

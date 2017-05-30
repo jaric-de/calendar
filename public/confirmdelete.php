@@ -1,5 +1,6 @@
 <?php
-if (isset($_POST['event_id'])) {
+session_start();
+if (isset($_POST['event_id']) && isset($_SESSION['user'])) {
     $id = $_POST['event_id'];
 } else {
     header("Location: ./");
